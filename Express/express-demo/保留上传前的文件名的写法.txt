@@ -1,0 +1,27 @@
+router.post('/podcast', (req, res, next) => {
+    const incomingForm = formidable({
+      uploadDir: path.resolve(__dirname, '../public/podcasts'), // 视频保存的目录
+      keepExtensions: true, // 保留文件扩展名
+      filename: (name, ext, part, form) => {
+        // 使用原始文件名和扩展名
+        return `${Date.now()}-${part.originalFilename}`;
+      },
+    });
+  
+    incomingForm.parse(req, (err, fields, files) => {
+      if (err) {
+        next(err);
+        return;
+      }
+  
+      // 假设只上传一个文件
+      const uploadedFile = files.file[0];
+      const videoUrl = `http://localhost:3000/podcasts/${uploadedFile.newFilename}`;
+  
+      res.send({
+        success: true,
+        message: 'File uploaded successfully',
+        videoUrl: videoUrl, // 返回视频的访问地址
+      });
+    });
+  });
